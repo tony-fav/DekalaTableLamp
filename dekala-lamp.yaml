@@ -1,0 +1,517 @@
+substitutions:
+  friendly_name: dekala_lamp
+  friendly_title: "Dekala Lamp"
+
+esphome:
+  name: dekala-lamp
+  platform: ESP8266
+  board: esp01_1m
+
+logger:
+  baud_rate: 0 # disable serial logging for Tuya MCU things
+
+api:
+
+ota:
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Dekala-Lamp Fallback Hotspot"
+
+captive_portal:
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/tony-fav/esphome
+      ref: dev
+    components: [ tuya ]
+    refresh: 30s
+
+uart:
+  rx_pin: GPIO3
+  tx_pin: GPIO1
+  baud_rate: 9600
+  
+tuya:
+  time_id: ha_time
+  id: tuya_mcu
+  
+light:
+    # This FULLY implements the "Night Light" Functionality
+  - platform: tuya
+    name: "${friendly_title} Night Light"
+    id: night_light
+    switch_datapoint: 104
+    dimmer_datapoint: 124
+    min_value: 10
+    max_value: 1000
+    
+    # This PARTIALLY implements the "Effect Light" Functionality
+    # Additional Features:
+    #   Choosing the Effect & Variant
+    #   Choosing the Effect Speed
+  - platform: tuya
+    name: "${friendly_title} Effect Light"
+    id: effect_light
+    switch_datapoint: 102
+    dimmer_datapoint: 123
+    min_value: 10
+    max_value: 1000
+    effects:
+      - lambda:
+          name: "Running"
+          update_interval: 1s
+          lambda: |-
+            //
+      - lambda:
+          name: "Aurora Left"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '0') or (value[89] != '0')) 
+            {
+              value[1] = '0';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Aurora Right"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '0') or (value[89] != '1')) 
+            {
+              value[1] = '0';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Sunlight Sunset Orange"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '1') or (value[89] != '0')) 
+            {
+              value[1] = '1';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Sunlight Sunrise Pink"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '1') or (value[89] != '1')) 
+            {
+              value[1] = '1';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Night Red"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '2') or (value[89] != '0')) 
+            {
+              value[1] = '2';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Night Blue"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '2') or (value[89] != '1')) 
+            {
+              value[1] = '2';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Night Orange"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '2') or (value[89] != '2')) 
+            {
+              value[1] = '2';
+              value[89] = '2'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Neon Clockwise"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '3') or (value[89] != '0')) 
+            {
+              value[1] = '3';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Neon Counterclockwise"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '3') or (value[89] != '1')) 
+            {
+              value[1] = '3';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Grassland GreenYellow"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '4') or (value[89] != '0')) 
+            {
+              value[1] = '4';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Grassland GreenWhite"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '4') or (value[89] != '1')) 
+            {
+              value[1] = '4';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Breath Red"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '5') or (value[89] != '0')) 
+            {
+              value[1] = '5';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Breath Purple"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '5') or (value[89] != '1')) 
+            {
+              value[1] = '5';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Breath Orange"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '5') or (value[89] != '2')) 
+            {
+              value[1] = '5';
+              value[89] = '2'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Breath Yellow"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '5') or (value[89] != '3')) 
+            {
+              value[1] = '5';
+              value[89] = '3'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Rainbow Up"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '6') or (value[89] != '0')) 
+            {
+              value[1] = '6';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Rainbow Down"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '6') or (value[89] != '1')) 
+            {
+              value[1] = '6';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Deep Sea RedBlueRed"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '7') or (value[89] != '0')) 
+            {
+              value[1] = '7';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Deep Sea WhiteBlueWhite"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '7') or (value[89] != '1')) 
+            {
+              value[1] = '7';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Bonfire Orange"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '8') or (value[89] != '0')) 
+            {
+              value[1] = '8';
+              value[89] = '0'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+      - lambda:
+          name: "Bonfire Red"
+          update_interval: 1s
+          lambda: |-
+            std::string value = id(dpid_103).state;
+            if ((value[1] != '8') or (value[89] != '1')) 
+            {
+              value[1] = '8';
+              value[89] = '1'; 
+              id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+            }
+    
+    # This PARTIALLY implementes the "Color Light" Functionality
+  - platform: rgb
+    name: "${friendly_title} Color Light"
+    id: color_light
+    red: color_light_output_r
+    green: color_light_output_g
+    blue: color_light_output_b
+    default_transition_length: 0s
+    on_turn_on:
+      - lambda: |-
+          id(tuya_mcu).set_boolean_datapoint_value(2, 1);
+    on_turn_off:
+      - lambda: |-
+          id(tuya_mcu).set_boolean_datapoint_value(2, 0);
+
+binary_sensor:
+  # Provide status to the light entity from the Tuya MCU.
+  - platform: tuya
+    id: color_light_onoff
+    sensor_datapoint: 2
+    on_state:
+      then:
+        - lambda: |-
+            if (id(color_light_onoff).state) {
+              auto call = id(color_light).turn_on();
+              call.perform();
+            } else {
+              auto call = id(color_light).turn_off();
+              call.perform();
+            }
+
+sensor:
+  # Provide status to the light entity from the Tuya MCU.
+  - platform: tuya
+    id: color_light_brightness
+    sensor_datapoint: 101
+    on_value:
+      then:
+        - lambda: |-
+            if (id(color_light_onoff).state) {
+              auto call = id(color_light).turn_on();
+              call.set_brightness(id(color_light_brightness).state/1000.0);
+              call.perform();
+            }
+
+# Need outputs for the RGB light entity. All 3 get changed on any brightness,
+# or color change. So, we do all our processing in the blue write action which
+# occurs last in the sequence.
+output:
+  - platform: template
+    id: color_light_output_r
+    type: float
+    write_action:
+      - lambda: |-
+          // ESP_LOGD("tony-fav", "color_light_output_r %f", state);
+
+  - platform: template
+    id: color_light_output_g
+    type: float
+    write_action:
+      - lambda: |-
+          // ESP_LOGD("tony-fav", "color_light_output_g %f", state);
+
+  - platform: template
+    id: color_light_output_b
+    type: float
+    write_action:
+      - lambda: |-
+          // ESP_LOGD("tony-fav", "color_light_output_b %f", state);
+          
+          float R = id(color_light).current_values.get_red();
+          float G = id(color_light).current_values.get_green();
+          float B = id(color_light).current_values.get_blue();
+          float bri = id(color_light).current_values.get_brightness();
+          
+          float V = max(max(R, G), B);
+          float C = V - min(min(R, G), B);
+          float L = V - 0.5*C;
+          float hue = 0.0;
+          float sat = 0.0;
+          if (C == 0.0) {
+            hue = 0.0;
+          } else if ((R >= G) and (R >= B)) {
+            hue = fmod(60.0*(G - B)/C + 360.0, 360.0);
+          } else if ((G >= R) and (G >= B)) {
+            hue = fmod(60.0*(2 + (B-R)/C) + 360.0, 360.0);
+          } else if ((B >= R) and (B >= G)) {
+            hue = fmod(60.0*(4 + (R-G)/C) + 360.0, 360.0);
+          }
+          if (V == 0.0) {
+            sat = 0.0;
+          } else {
+            sat = C/V;
+          }
+          
+          if (id(color_light_onoff).state) {
+            id(tuya_mcu).set_integer_datapoint_value(101, max(10, int(round(1000.0*bri))));
+            char buf[20];
+            std::string out;
+            sprintf(buf, "%04x", int(round(hue)));
+            out += buf;
+            sprintf(buf, "%04x", int(round(1000.0*sat)));
+            out += buf;
+            out += "03e8";
+            id(tuya_mcu).set_string_datapoint_value(11, out);
+          }
+
+text_sensor:
+  # Provide status to the light entity from the Tuya MCU. 
+  - platform: tuya
+    id: dpid_11
+    sensor_datapoint: 11
+    on_value:
+      then:
+        - lambda: |-
+            float hue = 1.0*esphome::tuya::hexquad_to_int(id(dpid_11).state, 0);
+            float chroma = esphome::tuya::hexquad_to_int(id(dpid_11).state, 4)/1000.0;
+            float hp = hue/60.0;
+            float xp = chroma*(1.0 - fabs(fmod(hp, 2.0) - 1.0));
+            float R = 0.0;
+            float G = 0.0;
+            float B = 0.0;
+            if (hp <= 1) {
+              R = chroma;
+              G = xp;
+              B = 0.0;
+            } else if (hp <= 2) {
+              R = xp;
+              G = chroma;
+              B = 0.0;
+            } else if (hp <= 3) {
+              R = 0.0;
+              G = chroma;
+              B = xp;
+            } else if (hp <= 4) {
+              R = 0.0;
+              G = xp;
+              B = chroma;
+            } else if (hp <= 5) {
+              R = xp;
+              G = 0.0;
+              B = chroma;
+            } else if (hp <= 6) {
+              R = chroma;
+              G = 0.0;
+              B = xp;
+            }
+            R += 1.0 - chroma;
+            G += 1.0 - chroma;
+            B += 1.0 - chroma;
+            
+            if (id(color_light_onoff).state) {
+              auto call = id(color_light).turn_on();
+              call.set_rgb(R, G, B);
+              call.perform();
+            }
+
+  - platform: tuya
+    id: dpid_103
+    sensor_datapoint: 103
+    on_value:
+      then:
+        - lambda: |-
+            auto call = id(effect_light).turn_on();
+            call.set_effect("Running");
+            call.perform();
+            float speed = 1.0*esphome::tuya::hexpair_to_int(id(dpid_103).state, 86);
+            id(effect_speed).set(speed);
+
+number:
+  - platform: template
+    name: "${friendly_title} Effect Speed"
+    id: effect_speed
+    min_value: 1
+    max_value: 8
+    step: 1
+    set_action:
+      - lambda: |-
+          id(effect_speed).publish_state(x);
+          std::string value = id(dpid_103).state;
+          char buf[1];
+          sprintf(buf, "%01X", int(x));
+          value[87] = buf[0];
+          id(tuya_mcu).set_raw_datapoint_value(103, esphome::tuya::raw_decode(value));
+
+# Don't need any of these to be controllable.    
+# switch:
+#   - platform: tuya
+#     name: "${friendly_title} Sleep Aid"
+#     switch_datapoint: 106
+#     internal: true
+#   - platform: tuya
+#     name: "${friendly_title} Alarm 1"
+#     switch_datapoint: 108
+#     internal: true
+#   - platform: tuya
+#     name: "${friendly_title} Alarm 2"
+#     switch_datapoint: 110
+#     internal: true
+#   - platform: tuya
+#     name: "${friendly_title} Stop Alarm"
+#     switch_datapoint: 112
+#     internal: true
+#   - platform: tuya
+#     name: "${friendly_title} Use Network Time"
+#     switch_datapoint: 115
+#     internal: true
+#   - platform: tuya
+#     name: "${friendly_title} Use 24 Hour Time"
+#     switch_datapoint: 125
+#     internal: true
